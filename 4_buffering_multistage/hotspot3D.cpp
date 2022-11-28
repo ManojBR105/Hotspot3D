@@ -42,13 +42,13 @@ void kernel_3D_hw(WD_t* powerIn, WD_t* tempIn, WD_t* tempOut, float Cap, float R
       case 0:
         load0(tempIn, local_tin_0, j);
         load1(powerIn, local_pin_0, j);
-        workload(local_pin_1, local_tin_1, local_tout_1, cc, ce, cn, ct, stepDivCap, amb_temp);
+        workload(local_pin_1, local_tin_1, local_tout_1, cc, ce, cn, ct, stepDivCap, amb_temp, j-2);
         store(tempOut, local_tout_0, j-2);
         break;
       case 1:
         load0(tempIn, local_tin_1, j);
         load1(powerIn, local_pin_1, j);
-        workload(local_pin_0, local_tin_0, local_tout_0, cc, ce, cn, ct, stepDivCap, amb_temp);
+        workload(local_pin_0, local_tin_0, local_tout_0, cc, ce, cn, ct, stepDivCap, amb_temp, j-1);
         store(tempOut, local_tout_1, j-2);
         break;
       }
@@ -58,27 +58,26 @@ void kernel_3D_hw(WD_t* powerIn, WD_t* tempIn, WD_t* tempOut, float Cap, float R
       case 0:
         load0(tempOut, local_tin_0, j);
         load1(powerIn, local_pin_0, j);
-        workload(local_pin_1, local_tin_1, local_tout_1, cc, ce, cn, ct, stepDivCap, amb_temp);
+        workload(local_pin_1, local_tin_1, local_tout_1, cc, ce, cn, ct, stepDivCap, amb_temp, j);
         store(tempIn, local_tout_0, j-2);
         
         break;
       case 1:
         load0(tempOut, local_tin_1, j);
         load1(powerIn, local_pin_1, j);
-        workload(local_pin_0, local_tin_0, local_tout_0, cc, ce, cn, ct, stepDivCap, amb_temp);
+        workload(local_pin_0, local_tin_0, local_tout_0, cc, ce, cn, ct, stepDivCap, amb_temp, j);
         store(tempIn, local_tout_1, j-2);
         break;
       }
     }
   }
 }
-
 void load0(WD_t* src, WD_t dst[ITY][TX], int row) {
   #pragma HLS inline off
   load_y:for(int y = 0; y < ITY; y++) {
     load_x:for(int x = 0; x < TX; x++) {
       #pragma HLS pipeline II=1
-      int ty = (y+row*TY-1);
+      int ty = (y+row*TY-STAGES);
       ty = (ty < 0) ? 0: (ty > NY-1) ? NY-1 : ty;
       dst[y][x] = src[ty*TX + x];
     }
@@ -90,7 +89,7 @@ void load1(WD_t* src, WD_t dst[ITY][TX], int row) {
   load_y:for(int y = 0; y < ITY; y++) {
     load_x:for(int x = 0; x < TX; x++) {
       #pragma HLS pipeline II=1
-      int ty = (y+row*TY-1);
+      int ty = (y+row*TY-STAGES-1);
       ty = (ty < 0) ? 0: (ty > NY-1) ? NY-1 : ty;
       dst[y][x] = src[ty*TX + x];
     }
@@ -108,11 +107,15 @@ void store(WD_t* dst, WD_t src[TY][TX], int row){
   }
 }
 
-void workload(WD_t powerIn[ITY][TX], WD_t tempIn[ITY][TX], WD_t tempOut[TY][TX], float cc, float cwe, float cns, float ctb, float stepDivCap, float amb_temp) {
+void workload(WD_t powerIn[ITY][TX], WD_t tempIn[ITY][TX], WD_t tempOut[TY][TX], float cc, float cwe, float cns, float ctb, float stepDivCap, float amb_temp, int row) {
   #pragma HLS inline off
   WD_t tempIn_stage0, powerIn_stage0, tempOut_stage0, powerOut_stage0;
   hls::stream<WD_t,FIFO_LEN> fifo0_0, fifo1_0;
   float ff0_0[PF][NZ], ff1_0[FF_LEN][PF][NZ], ff2_0[PF][NZ];
+
+  WD_t tempIn_stage1, powerIn_stage1, tempOut_stage1, powerOut_stage1;
+  hls::stream<WD_t,FIFO_LEN> fifo0_1, fifo1_1;
+  float ff0_1[PF][NZ], ff1_1[FF_LEN][PF][NZ], ff2_1[PF][NZ];
   
   #pragma HLS array_partition variable=ff0_0 complete dim=0
   #pragma HLS array_partition variable=ff1_0 complete dim=0
@@ -121,22 +124,62 @@ void workload(WD_t powerIn[ITY][TX], WD_t tempIn[ITY][TX], WD_t tempOut[TY][TX],
   #pragma HLS bind_storage variable = fifo0_0 type = FIFO impl = bram
   #pragma HLS bind_storage variable = fifo1_0 type = FIFO impl = bram
 
+  #pragma HLS array_partition variable=ff0_1 complete dim=0
+  #pragma HLS array_partition variable=ff1_1 complete dim=0
+  #pragma HLS array_partition variable=ff2_1 complete dim=0
+
+  #pragma HLS bind_storage variable = fifo0_1 type = FIFO impl = bram
+  #pragma HLS bind_storage variable = fifo1_1 type = FIFO impl = bram
+
   fifo_fill:for(int l=0; l<FIFO_LEN; l++){
     if(!fifo0_0.full())
       fifo0_0.write((WD_t)0);
     if(!fifo1_0.full())
       fifo1_0.write((WD_t)0);
-  }
+    
+    if(!fifo0_1.full())
+      fifo0_1.write((WD_t)0);
+    if(!fifo1_1.full())
+      fifo1_1.write((WD_t)0);
 
-  for(int yy = 0; yy < ITY; yy++) {
-    for(int x = 0; x < TX; x++) {
-      #pragma HLS pipeline II=1
-      tempIn_stage0  = tempIn[yy][x];//read till NY rows
-      powerIn_stage0 = yy>0 ? powerIn[yy-1][x] : (WD_t)0;//wait for 1 row and read NY rows
-      forward_data(tempIn_stage0, ff0_0, ff1_0, ff2_0, fifo0_0, fifo1_0);
-      compute(powerIn_stage0, tempOut_stage0, powerOut_stage0, ff0_0, ff1_0, ff2_0, cc, cwe, cns, ctb, amb_temp, stepDivCap, x*PF);
-      if(yy>1 && yy<ITY) {
-        tempOut[yy-2][x] = tempOut_stage0;
+  }
+  if(row>=0){
+    for(int yy = 0; yy < ITY; yy++) {
+      for(int x = 0; x < TX; x++) {
+        #pragma HLS pipeline II=1
+        int y = row*TY + yy;
+        tempIn_stage0  = tempIn[yy][x];//read till NY rows
+        powerIn_stage0 = powerIn[yy][x];//wait for 1 row and read NY rows
+        forward_data(tempIn_stage0, ff0_0, ff1_0, ff2_0, fifo0_0, fifo1_0);
+        compute(powerIn_stage0, tempOut_stage0, powerOut_stage0, ff0_0, ff1_0, ff2_0, cc, cwe, cns, ctb, amb_temp, stepDivCap, x*PF, y-2);
+        #ifndef __SYNTHESIS__
+        if((y<4 || y>508) && x==0){
+          int val0 = tempIn_stage0.range(31,0);
+          int val1 = powerIn_stage0.range(31,0);
+          int val2 = tempOut_stage0.range(31,0);
+          printf("\nS0:\t%d\t%f\t%f\t%f\t||\t",yy, *(float*)(&val0), *(float*)(&val1), *(float*)(&val2));
+        }
+        #endif
+        // if(yy>1 && yy<TY+1) {
+        //   tempInter0.write(tempOut_stage0);
+        // }
+
+        tempIn_stage1 = yy > 1 ? tempOut_stage0 : WD_t(0);
+        // tempIn_stage1  = (yy > 1 && yy < TY+1) ?  tempInter0.read() : WD_t(0);//wait for 1 row and read NY rows
+        powerIn_stage1 = yy>0 ?  powerIn[yy-1][x] : WD_t(0);//wait for 2 rows and read NY rows
+        forward_data(tempIn_stage1, ff0_1, ff1_1, ff2_1, fifo0_1, fifo1_1);
+        compute(powerIn_stage1, tempOut_stage1, powerOut_stage1, ff0_1, ff1_1, ff2_1, cc, cwe, cns, ctb, amb_temp, stepDivCap, x*PF, y-4);
+        #ifndef __SYNTHESIS__
+        if(x==0){
+          int val0 = tempIn_stage1.range(31,0);
+          int val1 = powerIn_stage1.range(31,0);
+          int val2 = tempOut_stage1.range(31,0);
+          printf("||\tS1:\t%d\t%f\t%f\t%f\t||\t",yy, *(float*)(&val0), *(float*)(&val1), *(float*)(&val2));
+        }
+        #endif
+        if(yy > 3) {
+          tempOut[yy-4][x] = tempOut_stage1;
+        }
       }
     }
   }
@@ -146,10 +189,15 @@ void workload(WD_t powerIn[ITY][TX], WD_t tempIn[ITY][TX], WD_t tempOut[TY][TX],
       fifo0_0.read();
     if(!fifo1_0.empty())
       fifo1_0.read();
+
+    if(!fifo0_1.empty())
+      fifo0_1.read();
+    if(!fifo1_1.empty())
+      fifo1_1.read();
   }
 }
 
-void compute(WD_t powerIn, WD_t &tempOut, WD_t &powerOut, float ff0[PF][NZ], float ff1[FF_LEN][PF][NZ], float ff2[PF][NZ], float cc, float cwe, float cns, float ctb, float amb_temp, float stepDivCap, int x) {
+void compute(WD_t powerIn, WD_t &tempOut, WD_t &powerOut, float ff0[PF][NZ], float ff1[FF_LEN][PF][NZ], float ff2[PF][NZ], float cc, float cwe, float cns, float ctb, float amb_temp, float stepDivCap, int x, int y) {
   #pragma HLS inline
   comp_xx:for(int xx=0; xx<PF; xx++) {
     #pragma HLS unroll 
@@ -169,6 +217,16 @@ void compute(WD_t powerIn, WD_t &tempOut, WD_t &powerOut, float ff0[PF][NZ], flo
       float power  = *(float*)(&p);
 
       float result = ((cc*center + power*stepDivCap) + cwe*(east+west)) + (cns*(north+south) +  ctb*((top+bottom)+amb_temp));
+      #ifndef __SYNTHESIS__
+      if((y<4 || y>508)&& x+xx==0 && z==0){
+      //     fwd_data_l1:for(int l = FF_LEN-1; l>=0; l--)
+      //       fwd_data_xx2:for(int xx=0; xx<PF; xx++)
+      //         fwd_data_z2:for(int z=0; z<NZ; z++) 
+      //           printf("ff1[%d][%d][%d]=%f\n",l,xx,z,ff1[l][xx][z]);
+        
+        printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t", center, west, east, north, south, bottom, top, power*stepDivCap,result);
+      }
+      #endif
       tempOut.range(32*(xx*NZ+z+1)-1, 32*(xx*NZ+z)) = *(int*)(&result);
     }
   }

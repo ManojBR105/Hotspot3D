@@ -26,11 +26,11 @@ void kernel_3D_hw(float* powerIn, float* tempIn, float* tempOut, float Cap, floa
   float local_tout [TY][NX][NZ];
 
   #pragma HLS array_partition variable=local_tin complete dim=3
-  // #pragma HLS array_partition variable=local_tin cyclic factor=8 dim=2 //factor = PF/2
+  #pragma HLS array_partition variable=local_tin cyclic factor=8 dim=2 //factor = PF/2
   #pragma HLS array_partition variable=local_pin complete dim=3
-  // #pragma HLS array_partition variable=local_pin cyclic factor=8 dim=2 //factor = PF/2
+  #pragma HLS array_partition variable=local_pin cyclic factor=8 dim=2 //factor = PF/2
   #pragma HLS array_partition variable=local_tout complete dim=3
-  // #pragma HLS array_partition variable=local_tout cyclic factor=16 dim=2 //factor = PF
+  #pragma HLS array_partition variable=local_tout cyclic factor=16 dim=2 //factor = PF
   #pragma HLS bind_storage variable = local_tin type = RAM_2P impl = uram
   #pragma HLS bind_storage variable = local_pin type = RAM_2P impl = uram
   #pragma HLS bind_storage variable = local_tout type = RAM_T2P impl = bram
@@ -98,11 +98,11 @@ void workload(float powerIn[ITY][NX][NZ], float tempIn[ITY][NX][NZ], float tempO
   }
 
   for(int yy = 0; yy < ITY; yy++) {
-    for(int x = 0; x < NX; x+=PF) {
+    for(int x = 0; x < NX/PF; x++) {
       tempIn_stage0  = read(tempIn, x, yy);//read till NY rows
       powerIn_stage0 = yy>0 ? read(powerIn, x, yy-1) : (WD_t)0;//wait for 1 row and read NY rows
       forward_data(tempIn_stage0, ff0_0, ff1_0, ff2_0, fifo0_0, fifo1_0);
-      compute(powerIn_stage0, tempOut_stage0, powerOut_stage0, ff0_0, ff1_0, ff2_0, cc, cwe, cns, ctb, amb_temp, stepDivCap, x);
+      compute(powerIn_stage0, tempOut_stage0, powerOut_stage0, ff0_0, ff1_0, ff2_0, cc, cwe, cns, ctb, amb_temp, stepDivCap, x*PF);
       if(yy>1 && yy<ITY) {
         write(tempOut, tempOut_stage0, x, yy-2);
       }
