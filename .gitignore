@@ -1,0 +1,14 @@
+#ignore everything
+*
+
+#but not these files
+!.gitignore
+
+#even if its in sub directories
+!*/
+!*/*.prj/**/syn/report/
+
+!*/*.cpp
+!*/*.h
+!*/*.tcl
+!*/*.prj/**/syn/report/*.rpt
