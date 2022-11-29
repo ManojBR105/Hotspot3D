@@ -1,3 +1,4 @@
+
 #include "hotspot3D.h" 
 
 void kernel_3D_hw(WD_t powerIn[NY*TX], WD_t tempIn[NY*TX], WD_t tempOut[NY*TX], float Cap, float Rx, float Ry, float Rz, float dt, float amb_temp)

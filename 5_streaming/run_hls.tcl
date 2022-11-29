@@ -21,7 +21,7 @@ csim_design -ldflags {-z stack-size=10485760}
 # synthesize the design
 csynth_design
 # do a co-simulation
-cosim_design
+# cosim_design
 # close project and quit
 close_project
 # exit Vivado HLS
