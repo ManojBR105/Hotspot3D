@@ -42,7 +42,7 @@ void kernel_3D_hw(WD_t* powerIn, WD_t* tempIn, WD_t* tempOut, float Cap, float R
       case 0:
         load0(tempIn, local_tin_0, j);
         load1(powerIn, local_pin_0, j);
-        workload(local_pin_1, local_tin_1, local_tout_1, cc, ce, cn, ct, stepDivCap, amb_temp, j-2);
+        workload(local_pin_1, local_tin_1, local_tout_1, cc, ce, cn, ct, stepDivCap, amb_temp, j-1);
         store(tempOut, local_tout_0, j-2);
         break;
       case 1:
@@ -58,14 +58,14 @@ void kernel_3D_hw(WD_t* powerIn, WD_t* tempIn, WD_t* tempOut, float Cap, float R
       case 0:
         load0(tempOut, local_tin_0, j);
         load1(powerIn, local_pin_0, j);
-        workload(local_pin_1, local_tin_1, local_tout_1, cc, ce, cn, ct, stepDivCap, amb_temp, j);
+        workload(local_pin_1, local_tin_1, local_tout_1, cc, ce, cn, ct, stepDivCap, amb_temp, j-1);
         store(tempIn, local_tout_0, j-2);
         
         break;
       case 1:
         load0(tempOut, local_tin_1, j);
         load1(powerIn, local_pin_1, j);
-        workload(local_pin_0, local_tin_0, local_tout_0, cc, ce, cn, ct, stepDivCap, amb_temp, j);
+        workload(local_pin_0, local_tin_0, local_tout_0, cc, ce, cn, ct, stepDivCap, amb_temp, j-1);
         store(tempIn, local_tout_1, j-2);
         break;
       }
@@ -143,7 +143,7 @@ void workload(WD_t powerIn[ITY][TX], WD_t tempIn[ITY][TX], WD_t tempOut[TY][TX],
       fifo1_1.write((WD_t)0);
 
   }
-  if(row>=0){
+  if(row>=0 && row<=(NY/TY)){
     for(int yy = 0; yy < ITY; yy++) {
       for(int x = 0; x < TX; x++) {
         #pragma HLS pipeline II=1
@@ -153,11 +153,11 @@ void workload(WD_t powerIn[ITY][TX], WD_t tempIn[ITY][TX], WD_t tempOut[TY][TX],
         forward_data(tempIn_stage0, ff0_0, ff1_0, ff2_0, fifo0_0, fifo1_0);
         compute(powerIn_stage0, tempOut_stage0, powerOut_stage0, ff0_0, ff1_0, ff2_0, cc, cwe, cns, ctb, amb_temp, stepDivCap, x*PF, y-2);
         #ifndef __SYNTHESIS__
-        if((y<4 || y>508) && x==0){
+        if((y<8 || y>504) && x==0){
           int val0 = tempIn_stage0.range(31,0);
           int val1 = powerIn_stage0.range(31,0);
           int val2 = tempOut_stage0.range(31,0);
-          printf("\nS0:\t%d\t%f\t%f\t%f\t||\t",yy, *(float*)(&val0), *(float*)(&val1), *(float*)(&val2));
+          printf("\nS0:\t%d\t%f\t%f\t%f\t||\t",y, *(float*)(&val0), *(float*)(&val1), *(float*)(&val2));
         }
         #endif
         // if(yy>1 && yy<TY+1) {
@@ -170,11 +170,11 @@ void workload(WD_t powerIn[ITY][TX], WD_t tempIn[ITY][TX], WD_t tempOut[TY][TX],
         forward_data(tempIn_stage1, ff0_1, ff1_1, ff2_1, fifo0_1, fifo1_1);
         compute(powerIn_stage1, tempOut_stage1, powerOut_stage1, ff0_1, ff1_1, ff2_1, cc, cwe, cns, ctb, amb_temp, stepDivCap, x*PF, y-4);
         #ifndef __SYNTHESIS__
-        if(x==0){
+        if((y<8 || y>504) && x==0){
           int val0 = tempIn_stage1.range(31,0);
           int val1 = powerIn_stage1.range(31,0);
           int val2 = tempOut_stage1.range(31,0);
-          printf("||\tS1:\t%d\t%f\t%f\t%f\t||\t",yy, *(float*)(&val0), *(float*)(&val1), *(float*)(&val2));
+          printf("||\tS1:\t%d\t%f\t%f\t%f\t||\t",y, *(float*)(&val0), *(float*)(&val1), *(float*)(&val2));
         }
         #endif
         if(yy > 3) {
@@ -218,14 +218,14 @@ void compute(WD_t powerIn, WD_t &tempOut, WD_t &powerOut, float ff0[PF][NZ], flo
 
       float result = ((cc*center + power*stepDivCap) + cwe*(east+west)) + (cns*(north+south) +  ctb*((top+bottom)+amb_temp));
       #ifndef __SYNTHESIS__
-      if((y<4 || y>508)&& x+xx==0 && z==0){
-      //     fwd_data_l1:for(int l = FF_LEN-1; l>=0; l--)
-      //       fwd_data_xx2:for(int xx=0; xx<PF; xx++)
-      //         fwd_data_z2:for(int z=0; z<NZ; z++) 
-      //           printf("ff1[%d][%d][%d]=%f\n",l,xx,z,ff1[l][xx][z]);
+      // if((y<4 || y>508)&& x+xx==0 && z==0){
+      // //     fwd_data_l1:for(int l = FF_LEN-1; l>=0; l--)
+      // //       fwd_data_xx2:for(int xx=0; xx<PF; xx++)
+      // //         fwd_data_z2:for(int z=0; z<NZ; z++) 
+      // //           printf("ff1[%d][%d][%d]=%f\n",l,xx,z,ff1[l][xx][z]);
         
-        printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t", center, west, east, north, south, bottom, top, power*stepDivCap,result);
-      }
+      //   printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t", center, west, east, north, south, bottom, top, power*stepDivCap,result);
+      // }
       #endif
       tempOut.range(32*(xx*NZ+z+1)-1, 32*(xx*NZ+z)) = *(int*)(&result);
     }

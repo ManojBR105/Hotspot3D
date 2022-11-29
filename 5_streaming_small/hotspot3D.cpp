@@ -37,30 +37,30 @@ void hotspot3D(WD_t powerIn[NY*TX], WD_t tempIn[NY*TX], WD_t tempOut[NY*TX], flo
   hls::stream<WD_t,1> tempInter0;
   hls::stream<WD_t,NX/PF> powerInter0;
 
-  WD_t tempIn_stage1, powerIn_stage1, tempOut_stage1, powerOut_stage1;
-  hls::stream<WD_t,FIFO_LEN> fifo0_1, fifo1_1;
-  float ff0_1[PF][NZ], ff1_1[FF_LEN][PF][NZ], ff2_1[PF][NZ];
+  // WD_t tempIn_stage1, powerIn_stage1, tempOut_stage1, powerOut_stage1;
+  // hls::stream<WD_t,FIFO_LEN> fifo0_1, fifo1_1;
+  // float ff0_1[PF][NZ], ff1_1[FF_LEN][PF][NZ], ff2_1[PF][NZ];
 
-  hls::stream<WD_t,1> tempInter1;
-  hls::stream<WD_t,NX/PF> powerInter1;
+  // hls::stream<WD_t,1> tempInter1;
+  // hls::stream<WD_t,NX/PF> powerInter1;
 
-  WD_t tempIn_stage2, powerIn_stage2, tempOut_stage2, powerOut_stage2;
-  hls::stream<WD_t,FIFO_LEN> fifo0_2, fifo1_2;
-  float ff0_2[PF][NZ], ff1_2[FF_LEN][PF][NZ], ff2_2[PF][NZ];
+  // WD_t tempIn_stage2, powerIn_stage2, tempOut_stage2, powerOut_stage2;
+  // hls::stream<WD_t,FIFO_LEN> fifo0_2, fifo1_2;
+  // float ff0_2[PF][NZ], ff1_2[FF_LEN][PF][NZ], ff2_2[PF][NZ];
 
-  hls::stream<WD_t,1> tempInter2;
-  hls::stream<WD_t,NX/PF> powerInter2;
+  // hls::stream<WD_t,1> tempInter2;
+  // hls::stream<WD_t,NX/PF> powerInter2;
 
-  WD_t tempIn_stage3, powerIn_stage3, tempOut_stage3, powerOut_stage3;
-  hls::stream<WD_t,FIFO_LEN> fifo0_3, fifo1_3;
-  float ff0_3[PF][NZ], ff1_3[FF_LEN][PF][NZ], ff2_3[PF][NZ];
+  // WD_t tempIn_stage3, powerIn_stage3, tempOut_stage3, powerOut_stage3;
+  // hls::stream<WD_t,FIFO_LEN> fifo0_3, fifo1_3;
+  // float ff0_3[PF][NZ], ff1_3[FF_LEN][PF][NZ], ff2_3[PF][NZ];
 
-  hls::stream<WD_t,1> tempInter3;
-  hls::stream<WD_t,NX/PF> powerInter3;
+  // hls::stream<WD_t,1> tempInter3;
+  // hls::stream<WD_t,NX/PF> powerInter3;
 
-  WD_t tempIn_stage4, powerIn_stage4, tempOut_stage4, powerOut_stage4;
-  hls::stream<WD_t,FIFO_LEN> fifo0_4, fifo1_4;
-  float ff0_4[PF][NZ], ff1_4[FF_LEN][PF][NZ], ff2_4[PF][NZ];
+  // WD_t tempIn_stage4, powerIn_stage4, tempOut_stage4, powerOut_stage4;
+  // hls::stream<WD_t,FIFO_LEN> fifo0_4, fifo1_4;
+  // float ff0_4[PF][NZ], ff1_4[FF_LEN][PF][NZ], ff2_4[PF][NZ];
   
   //stage 0
   #pragma HLS array_partition variable=ff0_0 complete dim=0
@@ -74,45 +74,45 @@ void hotspot3D(WD_t powerIn[NY*TX], WD_t tempIn[NY*TX], WD_t tempOut[NY*TX], flo
   #pragma HLS bind_storage variable = powerInter0 type = FIFO impl = bram
 
   //stage 1
-  #pragma HLS array_partition variable=ff0_1 complete dim=0
-  #pragma HLS array_partition variable=ff1_1 complete dim=0
-  #pragma HLS array_partition variable=ff2_1 complete dim=0
+  // #pragma HLS array_partition variable=ff0_1 complete dim=0
+  // #pragma HLS array_partition variable=ff1_1 complete dim=0
+  // #pragma HLS array_partition variable=ff2_1 complete dim=0
 
-  #pragma HLS bind_storage variable = fifo0_1 type = FIFO impl = bram
-  #pragma HLS bind_storage variable = fifo1_1 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = fifo0_1 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = fifo1_1 type = FIFO impl = bram
 
-  #pragma HLS bind_storage variable = tempInter1 type = FIFO 
-  #pragma HLS bind_storage variable = powerInter1 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = tempInter1 type = FIFO 
+  // #pragma HLS bind_storage variable = powerInter1 type = FIFO impl = bram
 
-  //stage 2
-  #pragma HLS array_partition variable=ff0_2 complete dim=0
-  #pragma HLS array_partition variable=ff1_2 complete dim=0
-  #pragma HLS array_partition variable=ff2_2 complete dim=0
+  // //stage 2
+  // #pragma HLS array_partition variable=ff0_2 complete dim=0
+  // #pragma HLS array_partition variable=ff1_2 complete dim=0
+  // #pragma HLS array_partition variable=ff2_2 complete dim=0
 
-  #pragma HLS bind_storage variable = fifo0_2 type = FIFO impl = bram
-  #pragma HLS bind_storage variable = fifo1_2 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = fifo0_2 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = fifo1_2 type = FIFO impl = bram
 
-  #pragma HLS bind_storage variable = tempInter2 type = FIFO 
-  #pragma HLS bind_storage variable = powerInter2 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = tempInter2 type = FIFO 
+  // #pragma HLS bind_storage variable = powerInter2 type = FIFO impl = bram
 
-  //stage 3
-  #pragma HLS array_partition variable=ff0_3 complete dim=0
-  #pragma HLS array_partition variable=ff1_3 complete dim=0
-  #pragma HLS array_partition variable=ff2_3 complete dim=0
+  // //stage 3
+  // #pragma HLS array_partition variable=ff0_3 complete dim=0
+  // #pragma HLS array_partition variable=ff1_3 complete dim=0
+  // #pragma HLS array_partition variable=ff2_3 complete dim=0
 
-  #pragma HLS bind_storage variable = fifo0_3 type = FIFO impl = bram
-  #pragma HLS bind_storage variable = fifo1_3 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = fifo0_3 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = fifo1_3 type = FIFO impl = bram
 
-  #pragma HLS bind_storage variable = tempInter3 type = FIFO 
-  #pragma HLS bind_storage variable = powerInter3 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = tempInter3 type = FIFO 
+  // #pragma HLS bind_storage variable = powerInter3 type = FIFO impl = bram
 
-  //stage 4
-  #pragma HLS array_partition variable=ff0_4 complete dim=0
-  #pragma HLS array_partition variable=ff1_4 complete dim=0
-  #pragma HLS array_partition variable=ff2_4 complete dim=0
+  // //stage 4
+  // #pragma HLS array_partition variable=ff0_4 complete dim=0
+  // #pragma HLS array_partition variable=ff1_4 complete dim=0
+  // #pragma HLS array_partition variable=ff2_4 complete dim=0
 
-  #pragma HLS bind_storage variable = fifo0_4 type = FIFO impl = bram
-  #pragma HLS bind_storage variable = fifo1_4 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = fifo0_4 type = FIFO impl = bram
+  // #pragma HLS bind_storage variable = fifo1_4 type = FIFO impl = bram
 
   
   fifo_fill:for(int l=0; l<FIFO_LEN; l++){
@@ -121,25 +121,25 @@ void hotspot3D(WD_t powerIn[NY*TX], WD_t tempIn[NY*TX], WD_t tempOut[NY*TX], flo
     if(!fifo1_0.full())
       fifo1_0.write((WD_t)0);
 
-    if(!fifo0_1.full())
-      fifo0_1.write((WD_t)0);
-    if(!fifo1_1.full())
-      fifo1_1.write((WD_t)0);
+    // if(!fifo0_1.full())
+    //   fifo0_1.write((WD_t)0);
+    // if(!fifo1_1.full())
+    //   fifo1_1.write((WD_t)0);
 
-    if(!fifo0_2.full())
-      fifo0_2.write((WD_t)0);
-    if(!fifo1_2.full())
-      fifo1_2.write((WD_t)0);
+    // if(!fifo0_2.full())
+    //   fifo0_2.write((WD_t)0);
+    // if(!fifo1_2.full())
+    //   fifo1_2.write((WD_t)0);
 
-    if(!fifo0_3.full())
-      fifo0_3.write((WD_t)0);
-    if(!fifo1_3.full())
-      fifo1_3.write((WD_t)0);
+    // if(!fifo0_3.full())
+    //   fifo0_3.write((WD_t)0);
+    // if(!fifo1_3.full())
+    //   fifo1_3.write((WD_t)0);
 
-    if(!fifo0_4.full())
-      fifo0_4.write((WD_t)0);
-    if(!fifo1_4.full())
-      fifo1_4.write((WD_t)0);
+    // if(!fifo0_4.full())
+    //   fifo0_4.write((WD_t)0);
+    // if(!fifo1_4.full())
+    //   fifo1_4.write((WD_t)0);
   }
 
 
@@ -151,43 +151,43 @@ void hotspot3D(WD_t powerIn[NY*TX], WD_t tempIn[NY*TX], WD_t tempOut[NY*TX], flo
       forward_data(tempIn_stage0, ff0_0, ff1_0, ff2_0, fifo0_0, fifo1_0);
       compute(powerIn_stage0, tempOut_stage0, powerOut_stage0, ff0_0, ff1_0, ff2_0, cc, ce, cn, ct, amb_temp, stepDivCap, x*PF, y-1);
       if(y>0 && y<NY+1) {
-        tempInter0.write(tempOut_stage0);
-        powerInter0.write(powerOut_stage0);
-      }
+      //   tempInter0.write(tempOut_stage0);
+      //   powerInter0.write(powerOut_stage0);
+      // }
 
-      tempIn_stage1  = (y > 0 && y < NY+1) ?  tempInter0.read() : WD_t(0);//wait for 1 row and read NY rows
-      powerIn_stage1 = (y > 1 && y < NY+2) ? powerInter0.read() : WD_t(0);//wait for 2 rows and read NY rows
-      forward_data(tempIn_stage1, ff0_1, ff1_1, ff2_1, fifo0_1, fifo1_1);
-      compute(powerIn_stage1, tempOut_stage1, powerOut_stage1, ff0_1, ff1_1, ff2_1, cc, ce, cn, ct, amb_temp, stepDivCap,x*PF, y-2);
-      if(y > 1 && y < NY+2) {
-        tempInter1.write(tempOut_stage1);
-        powerInter1.write(powerOut_stage1);
-      }
+      // tempIn_stage1  = (y > 0 && y < NY+1) ?  tempInter0.read() : WD_t(0);//wait for 1 row and read NY rows
+      // powerIn_stage1 = (y > 1 && y < NY+2) ? powerInter0.read() : WD_t(0);//wait for 2 rows and read NY rows
+      // forward_data(tempIn_stage1, ff0_1, ff1_1, ff2_1, fifo0_1, fifo1_1);
+      // compute(powerIn_stage1, tempOut_stage1, powerOut_stage1, ff0_1, ff1_1, ff2_1, cc, ce, cn, ct, amb_temp, stepDivCap,x*PF, y-2);
+      // if(y > 1 && y < NY+2) {
+      //   tempInter1.write(tempOut_stage1);
+      //   powerInter1.write(powerOut_stage1);
+      // }
 
-      tempIn_stage2  = (y > 1 && y < NY+2) ?  tempInter1.read() : WD_t(0);//wait for 2 rows and read NY rows
-      powerIn_stage2 = (y > 2 && y < NY+3) ? powerInter1.read() : WD_t(0);//wait for 3 rows and read NY rows
-      forward_data(tempIn_stage2, ff0_2, ff1_2, ff2_2, fifo0_2, fifo1_2);
-      compute(powerIn_stage2, tempOut_stage2, powerOut_stage2, ff0_2, ff1_2, ff2_2, cc, ce, cn, ct, amb_temp, stepDivCap, x*PF, y-3);
-      if(y > 2 && y < NY+3) {
-        tempInter2.write(tempOut_stage2);
-        powerInter2.write(powerOut_stage2);
-      }
+      // tempIn_stage2  = (y > 1 && y < NY+2) ?  tempInter1.read() : WD_t(0);//wait for 2 rows and read NY rows
+      // powerIn_stage2 = (y > 2 && y < NY+3) ? powerInter1.read() : WD_t(0);//wait for 3 rows and read NY rows
+      // forward_data(tempIn_stage2, ff0_2, ff1_2, ff2_2, fifo0_2, fifo1_2);
+      // compute(powerIn_stage2, tempOut_stage2, powerOut_stage2, ff0_2, ff1_2, ff2_2, cc, ce, cn, ct, amb_temp, stepDivCap, x*PF, y-3);
+      // if(y > 2 && y < NY+3) {
+      //   tempInter2.write(tempOut_stage2);
+      //   powerInter2.write(powerOut_stage2);
+      // }
 
-      tempIn_stage3  = (y > 2 && y < NY+3) ?  tempInter2.read() : WD_t(0);//wait for 3 rows and read NY rows
-      powerIn_stage3 = (y > 3 && y < NY+4) ? powerInter2.read() : WD_t(0);//wait for 4 rows and read NY rows
-      forward_data(tempIn_stage3, ff0_3, ff1_3, ff2_3, fifo0_3, fifo1_3);
-      compute(powerIn_stage3, tempOut_stage3, powerOut_stage3, ff0_3, ff1_3, ff2_3, cc, ce, cn, ct, amb_temp, stepDivCap,x*PF, y-4);
-      if(y > 3 && y < NY+4) {
-        tempInter3.write(tempOut_stage3);
-        powerInter3.write(powerOut_stage3);
-      }
+      // tempIn_stage3  = (y > 2 && y < NY+3) ?  tempInter2.read() : WD_t(0);//wait for 3 rows and read NY rows
+      // powerIn_stage3 = (y > 3 && y < NY+4) ? powerInter2.read() : WD_t(0);//wait for 4 rows and read NY rows
+      // forward_data(tempIn_stage3, ff0_3, ff1_3, ff2_3, fifo0_3, fifo1_3);
+      // compute(powerIn_stage3, tempOut_stage3, powerOut_stage3, ff0_3, ff1_3, ff2_3, cc, ce, cn, ct, amb_temp, stepDivCap,x*PF, y-4);
+      // if(y > 3 && y < NY+4) {
+      //   tempInter3.write(tempOut_stage3);
+      //   powerInter3.write(powerOut_stage3);
+      // }
 
-      tempIn_stage4  = (y > 3 && y < NY+4) ?  tempInter3.read() : WD_t(0);//wait for 4 rows and read NY rows
-      powerIn_stage4 = (y > 4 && y < NY+5) ? powerInter3.read() : WD_t(0);//wait for 5 rows and read NY rows
-      forward_data(tempIn_stage4, ff0_4, ff1_4, ff2_4, fifo0_4, fifo1_4);
-      compute(powerIn_stage4, tempOut_stage4, powerOut_stage4, ff0_4, ff1_4, ff2_4, cc, ce, cn, ct, amb_temp, stepDivCap,x*PF, y-5);
-      if(y > 4) {
-        tempOut[(y-5)*TX+x] = tempOut_stage4;
+      // tempIn_stage4  = (y > 3 && y < NY+4) ?  tempInter3.read() : WD_t(0);//wait for 4 rows and read NY rows
+      // powerIn_stage4 = (y > 4 && y < NY+5) ? powerInter3.read() : WD_t(0);//wait for 5 rows and read NY rows
+      // forward_data(tempIn_stage4, ff0_4, ff1_4, ff2_4, fifo0_4, fifo1_4);
+      // compute(powerIn_stage4, tempOut_stage4, powerOut_stage4, ff0_4, ff1_4, ff2_4, cc, ce, cn, ct, amb_temp, stepDivCap,x*PF, y-5);
+      // if(y > 4) {
+        tempOut[(y-1)*TX+x] = tempOut_stage4;
       }
     }
   }
@@ -199,25 +199,25 @@ void hotspot3D(WD_t powerIn[NY*TX], WD_t tempIn[NY*TX], WD_t tempOut[NY*TX], flo
     if(!fifo1_0.empty())
       fifo1_0.read();
 
-    if(!fifo0_1.empty())
-      fifo0_1.read();
-    if(!fifo1_1.empty())
-      fifo1_1.read();
+    // if(!fifo0_1.empty())
+    //   fifo0_1.read();
+    // if(!fifo1_1.empty())
+    //   fifo1_1.read();
 
-    if(!fifo0_2.empty())
-      fifo0_2.read();
-    if(!fifo1_2.empty())
-      fifo1_2.read();
+    // if(!fifo0_2.empty())
+    //   fifo0_2.read();
+    // if(!fifo1_2.empty())
+    //   fifo1_2.read();
 
-    if(!fifo0_3.empty())
-      fifo0_3.read();
-    if(!fifo1_3.empty())
-      fifo1_3.read();
+    // if(!fifo0_3.empty())
+    //   fifo0_3.read();
+    // if(!fifo1_3.empty())
+    //   fifo1_3.read();
     
-    if(!fifo0_4.empty())
-      fifo0_4.read();
-    if(!fifo1_4.empty())
-      fifo1_4.read();
+    // if(!fifo0_4.empty())
+    //   fifo0_4.read();
+    // if(!fifo1_4.empty())
+    //   fifo1_4.read();
   }
 }
 

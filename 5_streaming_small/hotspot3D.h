@@ -24,9 +24,9 @@
 #define ITR 20000
 #endif
 
-#define WIDTH_FACTOR 16 //(512/32)
+#define WIDTH_FACTOR 16 
 #define WD_t ap_uint<WIDTH_FACTOR*32>
-#define STAGES 5
+#define STAGES 1
 #define PF (WIDTH_FACTOR/NZ)
 #define TX (NX/PF)
 #define FF_LEN 3

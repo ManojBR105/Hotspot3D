@@ -17,7 +17,7 @@
 #endif
 
 #ifdef __SYNTHESIS__
-#define ITR 10000
+#define ITR 20000
 #endif
 
 #ifndef __SYNTHESIS__
@@ -28,13 +28,8 @@
 #define TY 64
 #endif
 
-#define WIDTH_FACTOR 16 //(512/32)
-#define WD_t ap_uint<WIDTH_FACTOR*32>
 #define STAGES 1
 #define ITY (TY+2*STAGES)
-#define PF (WIDTH_FACTOR/NZ)
-#define FF_LEN 3
-#define FIFO_LEN (NX/PF)-(FF_LEN-1)
 
 
 

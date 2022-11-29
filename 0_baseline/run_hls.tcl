@@ -9,9 +9,6 @@ set_top kernel_3D_hw
 add_files hotspot3D.cpp
 # add the testbench files
 add_files -tb hotspot3D_test.cpp
-add_files -tb ../../data/hotspot3D/power_512x8
-add_files -tb ../../data/hotspot3D/temp_512x8
-add_files -tb output_512x8.out
 # open HLS solution solution1
 open_solution "solution1"
 # set target FPGA device: Alveo U50 in this example

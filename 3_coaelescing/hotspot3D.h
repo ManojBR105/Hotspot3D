@@ -17,7 +17,7 @@
 #endif
 
 #ifdef __SYNTHESIS__
-#define ITR 10000
+#define ITR 20000
 #endif
 
 #ifndef __SYNTHESIS__

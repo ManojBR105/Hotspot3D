@@ -10,10 +10,8 @@
 #endif
 
 #ifdef __SYNTHESIS__
-#define ITR 10000
+#define ITR 20000
 #endif
-
-#define TY 64
 
 #ifndef __SYNTHESIS__
 #include <stdio.h>
